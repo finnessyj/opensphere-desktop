@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
 
 import com.bitsys.common.http.client.HttpClient;
@@ -26,61 +27,95 @@ import io.opensphere.server.serverprovider.http.header.HeaderValues;
  * Posts a file to the server.
  *
  */
-public class FilePostRequestorImpl extends BaseRequestor implements FilePostRequestor
-{
-    /**
-     * Constructs a new file post requestor.
-     *
-     * @param client The HttpClient object to use to communicate with the
-     *            server.
-     * @param headerValues Contains the header values.
-     * @param eventManager The manager through which events are sent.
-     * @param networkConfigurationManager The network configuration manager.
-     */
-    public FilePostRequestorImpl(HttpClient client, HeaderValues headerValues, EventManager eventManager, NetworkConfigurationManager networkConfigurationManager)
-    {
-        super(client, headerValues, eventManager, networkConfigurationManager);
-    }
+public class FilePostRequestorImpl extends BaseRequestor implements FilePostRequestor {
+	private HttpClient myClient;
+	private HeaderValues myHeaderValues;
+	private EventManager myEventManager;
+	private NetworkConfigurationManager myNetworkConfigurationManager;
 
-    @Override
-    public CancellableInputStream postFileToServer(URL postToURL, Map<String, String> metaDataParts, File fileToPost,
-            ResponseValues response) throws IOException, URISyntaxException
-    {
-        final MultipartEntity entity = new MultipartEntity();
-        for (Map.Entry<String, String> entry : metaDataParts.entrySet())
-        {
-            entity.addPart(entry.getKey(), new StringBodyPart(entry.getValue(), ContentType.TEXT_PLAIN));
-        }
-        entity.addPart(fileToPost.getName(), new FileBodyPart(fileToPost));
+	/**
+	 * Constructs a new file post requestor.
+	 *
+	 * @param client                      The HttpClient object to use to
+	 *                                    communicate with the server.
+	 * @param headerValues                Contains the header values.
+	 * @param eventManager                The manager through which events are sent.
+	 * @param networkConfigurationManager The network configuration manager.
+	 */
+	public FilePostRequestorImpl(HttpClient client, HeaderValues headerValues, EventManager eventManager,
+			NetworkConfigurationManager networkConfigurationManager) {
+		super(client, headerValues, eventManager, networkConfigurationManager);
 
-        HttpRequest request = HttpRequestFactory.getInstance().post(postToURL.toURI(), entity);
-        CancellableInputStream responseStream = executeRequest(request, response);
-        return handleRedirect(responseStream, response, new Function<String, HttpRequest>()
-        {
-            @Override
-            public HttpRequest apply(String newUrlString)
-            {
-                return entity.isRepeatable() ? HttpRequestFactory.getInstance().post(URI.create(newUrlString), entity) : null;
-            }
-        });
-    }
+		myClient = client;
+		myHeaderValues = headerValues;
+		myEventManager = eventManager;
+		myNetworkConfigurationManager = networkConfigurationManager;
 
-    @Override
-    public CancellableInputStream postFileToServer(URL postToURL, File fileToPost,
-            ResponseValues response) throws IOException, URISyntaxException
-    {
-        final MultipartEntity entity = new MultipartEntity();
-        entity.addPart(fileToPost.getName(), new FileBodyPart(fileToPost));
+	}
 
-        HttpRequest request = HttpRequestFactory.getInstance().post(postToURL.toURI(), entity);
-        CancellableInputStream responseStream = executeRequest(request, response);
-        return handleRedirect(responseStream, response, new Function<String, HttpRequest>()
-        {
-            @Override
-            public HttpRequest apply(String newUrlString)
-            {
-                return entity.isRepeatable() ? HttpRequestFactory.getInstance().post(URI.create(newUrlString), entity) : null;
-            }
-        });
-    }
+	@Override
+	public CancellableInputStream postFileToServer(URL postToURL, Map<String, String> metaDataParts, File fileToPost,
+			ResponseValues response) throws IOException, URISyntaxException {
+		final MultipartEntity entity = new MultipartEntity();
+		for (Map.Entry<String, String> entry : metaDataParts.entrySet()) {
+			entity.addPart(entry.getKey(), new StringBodyPart(entry.getValue(), ContentType.TEXT_PLAIN));
+		}
+		entity.addPart(fileToPost.getName(), new FileBodyPart(fileToPost));
+
+		HttpRequest request = HttpRequestFactory.getInstance().post(postToURL.toURI(), entity);
+		CancellableInputStream responseStream = executeRequest(request, response);
+		return handleRedirect(responseStream, response, new Function<String, HttpRequest>() {
+			@Override
+			public HttpRequest apply(String newUrlString) {
+				return entity.isRepeatable() ? HttpRequestFactory.getInstance().post(URI.create(newUrlString), entity)
+						: null;
+			}
+		});
+	}
+
+	@Override
+	public CancellableInputStream postFileToServer(URL postToURL, File fileToPost, ResponseValues response)
+			throws IOException, URISyntaxException {
+		final MultipartEntity entity = new MultipartEntity();
+		entity.addPart(fileToPost.getName(), new FileBodyPart(fileToPost));
+
+		HttpRequest request = HttpRequestFactory.getInstance().post(postToURL.toURI(), entity);
+		CancellableInputStream responseStream = executeRequest(request, response);
+		return handleRedirect(responseStream, response, new Function<String, HttpRequest>() {
+			@Override
+			public HttpRequest apply(String newUrlString) {
+				return entity.isRepeatable() ? HttpRequestFactory.getInstance().post(URI.create(newUrlString), entity)
+						: null;
+			}
+		});
+	}
+
+	public CancellableInputStream postFileToServer(URL postToURL, File fileToPost, ResponseValues response,
+			Map<String, String> extraHeaderValues) throws IOException, URISyntaxException {
+
+		final MultipartEntity entity = new MultipartEntity();
+		entity.addPart("file", new FileBodyPart(fileToPost));
+		System.out.println(fileToPost.getName());
+
+		HttpRequest request = HttpRequestFactory.getInstance().post(postToURL.toURI(), entity);
+		System.out.println("--------------------------------------------------------------");
+		System.out.println(request.getHeaders());
+		System.out.println("--------------------------------------------------------------");
+		for (Entry<String, String> extraHeader : extraHeaderValues.entrySet()) {
+			System.out.println(extraHeader);
+			request.getHeaders().put(extraHeader.getKey(), extraHeader.getValue());
+		}
+		System.out.println("--------------------------------------------------------------");
+		System.out.println(request.getHeaders());
+		System.out.println("--------------------------------------------------------------");
+		CancellableInputStream responseStream = executeRequest(request, response);
+
+		return handleRedirect(responseStream, response, new Function<String, HttpRequest>() {
+			@Override
+			public HttpRequest apply(String newUrlString) {
+				return entity.isRepeatable() ? HttpRequestFactory.getInstance().post(URI.create(newUrlString), entity)
+						: null;
+			}
+		});
+	}
 }

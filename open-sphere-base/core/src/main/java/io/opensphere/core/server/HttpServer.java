@@ -60,6 +60,22 @@ public interface HttpServer
      */
     CancellableInputStream postFile(URL postToURL, File fileToPost, ResponseValues response)
         throws IOException, URISyntaxException;
+    
+    
+    /**
+     * Sends a file to the specified url.
+     *
+     * @param postToURL the post to url
+     * @param fileToPost the file to post
+     * @param response the response
+     * @param extraHeaderValues additional headers
+     * @return the input stream
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws URISyntaxException Thrown if an error occurs converting the URL
+     *             to a URI.
+     */
+    CancellableInputStream postFile(URL postToURL, File fileToPost, ResponseValues response,Map<String, String> extraHeaderValues)
+            throws IOException, URISyntaxException;
 
     /**
      * Gets a host and port to connect to based on the configured proxy settings

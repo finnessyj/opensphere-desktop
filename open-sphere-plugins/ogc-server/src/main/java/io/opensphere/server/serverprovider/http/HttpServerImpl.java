@@ -24,245 +24,226 @@ import javafx.application.Platform;
  * Sends http requests to a specified server.
  *
  */
-public class HttpServerImpl implements HttpServer
-{
-    /**
-     * The server host name.
-     */
-    private final String myHost;
+public class HttpServerImpl implements HttpServer {
+	/**
+	 * The server host name.
+	 */
+	private final String myHost;
 
-    /**
-     * The protocol used to connect to the server, e.g. http or https.
-     */
-    private final String myProtocol;
+	/**
+	 * The protocol used to connect to the server, e.g. http or https.
+	 */
+	private final String myProtocol;
 
-    /**
-     * Provides the different requestors used to communicate with an http
-     * server.
-     */
-    private final RequestorProvider myRequestorProvider;
+	/**
+	 * Provides the different requestors used to communicate with an http server.
+	 */
+	private final RequestorProvider myRequestorProvider;
 
-    /**
-     * Constructs an HttpServerImpl.
-     *
-     * @param host The server host name.
-     * @param protocol The protocol used to connect to the server, e.g. http or
-     *            https.
-     * @param requestorProvider Provides the different requestors used to
-     *            communicate with an http server.
-     */
-    public HttpServerImpl(String host, String protocol, RequestorProvider requestorProvider)
-    {
-        myHost = host;
-        myProtocol = protocol;
-        myRequestorProvider = requestorProvider;
-    }
+	/**
+	 * Constructs an HttpServerImpl.
+	 *
+	 * @param host              The server host name.
+	 * @param protocol          The protocol used to connect to the server, e.g.
+	 *                          http or https.
+	 * @param requestorProvider Provides the different requestors used to
+	 *                          communicate with an http server.
+	 */
+	public HttpServerImpl(String host, String protocol, RequestorProvider requestorProvider) {
+		myHost = host;
+		myProtocol = protocol;
+		myRequestorProvider = requestorProvider;
+	}
 
-    @Override
-    public String getHost()
-    {
-        return myHost;
-    }
+	@Override
+	public String getHost() {
+		return myHost;
+	}
 
-    @Override
-    public String getProtocol()
-    {
-        return myProtocol;
-    }
+	@Override
+	public String getProtocol() {
+		return myProtocol;
+	}
 
-    /**
-     * Gets the requestor provider.
-     *
-     * @return The requestor provider.
-     */
-    public RequestorProvider getRequestProvider()
-    {
-        return myRequestorProvider;
-    }
+	/**
+	 * Gets the requestor provider.
+	 *
+	 * @return The requestor provider.
+	 */
+	public RequestorProvider getRequestProvider() {
+		return myRequestorProvider;
+	}
 
-    @Override
-    public CancellableInputStream postFile(URL postToURL, Map<String, String> metaDataParts, File fileToPost,
-            ResponseValues response)
-        throws IOException, URISyntaxException
-    {
-        assert !EventQueue.isDispatchThread();
-        assert !Platform.isFxApplicationThread();
+	@Override
+	public CancellableInputStream postFile(URL postToURL, Map<String, String> metaDataParts, File fileToPost,
+			ResponseValues response) throws IOException, URISyntaxException {
+		assert !EventQueue.isDispatchThread();
+		assert !Platform.isFxApplicationThread();
 
-        return myRequestorProvider.getFilePoster().postFileToServer(postToURL, metaDataParts, fileToPost, response);
-    }
+		return myRequestorProvider.getFilePoster().postFileToServer(postToURL, metaDataParts, fileToPost, response);
+	}
 
-    @Override
-    public CancellableInputStream postFile(URL postToURL, File fileToPost, ResponseValues response)
-        throws IOException, URISyntaxException
-    {
-        assert !EventQueue.isDispatchThread();
-        assert !Platform.isFxApplicationThread();
+	@Override
+	public CancellableInputStream postFile(URL postToURL, File fileToPost, ResponseValues response)
+			throws IOException, URISyntaxException {
+		assert !EventQueue.isDispatchThread();
+		assert !Platform.isFxApplicationThread();
 
-        return myRequestorProvider.getFilePoster().postFileToServer(postToURL, fileToPost, response);
-    }
+		return myRequestorProvider.getFilePoster().postFileToServer(postToURL, fileToPost, response);
+	}
 
-    @Override
-    public Pair<String, Integer> resolveProxy(URL destination)
-    {
-        return myRequestorProvider.resolveProxy(destination);
-    }
+	@Override
+	public Pair<String, Integer> resolveProxy(URL destination) {
+		return myRequestorProvider.resolveProxy(destination);
+	}
 
-    @Override
-    public Proxy resolveProxyConfig(URL destination)
-    {
-        Proxy proxy = null;
-        ProxyHostConfig config = myRequestorProvider.resolveProxyConfig(destination);
-        if (config != null)
-        {
-            proxy = ProxySelectorImpl.getProxy(config);
-        }
-        return proxy;
-    }
+	@Override
+	public Proxy resolveProxyConfig(URL destination) {
+		Proxy proxy = null;
+		ProxyHostConfig config = myRequestorProvider.resolveProxyConfig(destination);
+		if (config != null) {
+			proxy = ProxySelectorImpl.getProxy(config);
+		}
+		return proxy;
+	}
 
-    @Override
-    public CancellableInputStream sendDelete(URL url, ResponseValues response) throws IOException, URISyntaxException
-    {
-        assert !EventQueue.isDispatchThread();
-        assert !Platform.isFxApplicationThread();
+	@Override
+	public CancellableInputStream sendDelete(URL url, ResponseValues response) throws IOException, URISyntaxException {
+		assert !EventQueue.isDispatchThread();
+		assert !Platform.isFxApplicationThread();
 
-        return myRequestorProvider.getDeleteRequestor().sendDelete(url, response);
-    }
+		return myRequestorProvider.getDeleteRequestor().sendDelete(url, response);
+	}
 
-    @Override
-    public CancellableInputStream sendDelete(URL url, Map<String, String> extraHeaderValues, ResponseValues response)
-        throws IOException, URISyntaxException
-    {
-        assert !EventQueue.isDispatchThread();
-        assert !Platform.isFxApplicationThread();
+	@Override
+	public CancellableInputStream sendDelete(URL url, Map<String, String> extraHeaderValues, ResponseValues response)
+			throws IOException, URISyntaxException {
+		assert !EventQueue.isDispatchThread();
+		assert !Platform.isFxApplicationThread();
 
-        return myRequestorProvider.getDeleteRequestor().sendDelete(url, extraHeaderValues, response);
-    }
+		return myRequestorProvider.getDeleteRequestor().sendDelete(url, extraHeaderValues, response);
+	}
 
-    @Override
-    public CancellableInputStream sendGet(URL url, Map<String, String> extraHeaderValues, ResponseValues response)
-        throws IOException, URISyntaxException
-    {
-        assert !EventQueue.isDispatchThread();
-        assert !Platform.isFxApplicationThread();
+	@Override
+	public CancellableInputStream sendGet(URL url, Map<String, String> extraHeaderValues, ResponseValues response)
+			throws IOException, URISyntaxException {
+		assert !EventQueue.isDispatchThread();
+		assert !Platform.isFxApplicationThread();
 
-        return myRequestorProvider.getRequestor().sendGet(url, extraHeaderValues, response);
-    }
+		return myRequestorProvider.getRequestor().sendGet(url, extraHeaderValues, response);
+	}
 
-    @Override
-    public CancellableInputStream sendGet(URL url, ResponseValues response) throws IOException, URISyntaxException
-    {
-        assert !EventQueue.isDispatchThread();
-        assert !Platform.isFxApplicationThread();
+	@Override
+	public CancellableInputStream sendGet(URL url, ResponseValues response) throws IOException, URISyntaxException {
+		assert !EventQueue.isDispatchThread();
+		assert !Platform.isFxApplicationThread();
 
-        return myRequestorProvider.getRequestor().sendGet(url, response);
-    }
+		return myRequestorProvider.getRequestor().sendGet(url, response);
+	}
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see io.opensphere.core.server.HttpServer#sendHead(java.net.URL,
-     *      java.util.Map, io.opensphere.core.server.ResponseValues)
-     */
-    @Override
-    public void sendHead(URL url, Map<String, String> extraHeaderValues, ResponseValues response)
-        throws IOException, URISyntaxException
-    {
-        assert !EventQueue.isDispatchThread();
-        assert !Platform.isFxApplicationThread();
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @see io.opensphere.core.server.HttpServer#sendHead(java.net.URL,
+	 *      java.util.Map, io.opensphere.core.server.ResponseValues)
+	 */
+	@Override
+	public void sendHead(URL url, Map<String, String> extraHeaderValues, ResponseValues response)
+			throws IOException, URISyntaxException {
+		assert !EventQueue.isDispatchThread();
+		assert !Platform.isFxApplicationThread();
 
-        myRequestorProvider.getHeadRequestor().sendHead(url, extraHeaderValues, response);
-    }
+		myRequestorProvider.getHeadRequestor().sendHead(url, extraHeaderValues, response);
+	}
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see io.opensphere.core.server.HttpServer#sendHead(java.net.URL,
-     *      io.opensphere.core.server.ResponseValues)
-     */
-    @Override
-    public void sendHead(URL url, ResponseValues response) throws IOException, URISyntaxException
-    {
-        assert !EventQueue.isDispatchThread();
-        assert !Platform.isFxApplicationThread();
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @see io.opensphere.core.server.HttpServer#sendHead(java.net.URL,
+	 *      io.opensphere.core.server.ResponseValues)
+	 */
+	@Override
+	public void sendHead(URL url, ResponseValues response) throws IOException, URISyntaxException {
+		assert !EventQueue.isDispatchThread();
+		assert !Platform.isFxApplicationThread();
 
-        myRequestorProvider.getHeadRequestor().sendHead(url, response);
-    }
+		myRequestorProvider.getHeadRequestor().sendHead(url, response);
+	}
 
-    @Override
-    public CancellableInputStream sendPost(URL url, InputStream postData, Map<String, String> extraHeaderValues,
-            ResponseValues response, ContentType contentType)
-        throws IOException, URISyntaxException
-    {
-        assert !EventQueue.isDispatchThread();
-        assert !Platform.isFxApplicationThread();
+	@Override
+	public CancellableInputStream sendPost(URL url, InputStream postData, Map<String, String> extraHeaderValues,
+			ResponseValues response, ContentType contentType) throws IOException, URISyntaxException {
+		assert !EventQueue.isDispatchThread();
+		assert !Platform.isFxApplicationThread();
 
-        com.bitsys.common.http.header.ContentType commonContentType = com.bitsys.common.http.header.ContentType.APPLICATION_XML;
+		com.bitsys.common.http.header.ContentType commonContentType = com.bitsys.common.http.header.ContentType.APPLICATION_XML;
 
-        if (contentType == ContentType.JSON)
-        {
-            commonContentType = com.bitsys.common.http.header.ContentType.APPLICATION_JSON;
-        }
+		if (contentType == ContentType.JSON) {
+			commonContentType = com.bitsys.common.http.header.ContentType.APPLICATION_JSON;
+		}
 
-        return myRequestorProvider.getPostRequestor().sendPost(url, postData, extraHeaderValues, response, commonContentType);
-    }
+		return myRequestorProvider.getPostRequestor().sendPost(url, postData, extraHeaderValues, response,
+				commonContentType);
+	}
 
-    @Override
-    public CancellableInputStream sendPost(URL url, InputStream postData, ResponseValues response)
-        throws IOException, URISyntaxException
-    {
-        assert !EventQueue.isDispatchThread();
-        assert !Platform.isFxApplicationThread();
+	@Override
+	public CancellableInputStream sendPost(URL url, InputStream postData, ResponseValues response)
+			throws IOException, URISyntaxException {
+		assert !EventQueue.isDispatchThread();
+		assert !Platform.isFxApplicationThread();
 
-        return myRequestorProvider.getPostRequestor().sendPost(url, postData, response);
-    }
+		return myRequestorProvider.getPostRequestor().sendPost(url, postData, response);
+	}
 
-    @Override
-    public CancellableInputStream sendPost(URL url, InputStream postData, ResponseValues response, ContentType contentType)
-        throws IOException, URISyntaxException
-    {
-        assert !EventQueue.isDispatchThread();
-        assert !Platform.isFxApplicationThread();
+	@Override
+	public CancellableInputStream sendPost(URL url, InputStream postData, ResponseValues response,
+			ContentType contentType) throws IOException, URISyntaxException {
+		assert !EventQueue.isDispatchThread();
+		assert !Platform.isFxApplicationThread();
 
-        com.bitsys.common.http.header.ContentType commonContentType = com.bitsys.common.http.header.ContentType.APPLICATION_XML;
+		com.bitsys.common.http.header.ContentType commonContentType = com.bitsys.common.http.header.ContentType.APPLICATION_XML;
 
-        if (contentType == ContentType.JSON)
-        {
-            commonContentType = com.bitsys.common.http.header.ContentType.APPLICATION_JSON;
-        }
+		if (contentType == ContentType.JSON) {
+			commonContentType = com.bitsys.common.http.header.ContentType.APPLICATION_JSON;
+		}
 
-        return myRequestorProvider.getPostRequestor().sendPost(url, postData, response, commonContentType);
-    }
+		return myRequestorProvider.getPostRequestor().sendPost(url, postData, response, commonContentType);
+	}
 
-    @Override
-    public CancellableInputStream sendPost(URL url, Map<String, String> extraHeaderValues, Map<String, String> postData,
-            ResponseValues response)
-        throws IOException, URISyntaxException
-    {
-        assert !EventQueue.isDispatchThread();
-        assert !Platform.isFxApplicationThread();
+	@Override
+	public CancellableInputStream sendPost(URL url, Map<String, String> extraHeaderValues, Map<String, String> postData,
+			ResponseValues response) throws IOException, URISyntaxException {
+		assert !EventQueue.isDispatchThread();
+		assert !Platform.isFxApplicationThread();
 
-        return myRequestorProvider.getPostRequestor().sendPost(url, extraHeaderValues, postData, response);
-    }
+		return myRequestorProvider.getPostRequestor().sendPost(url, extraHeaderValues, postData, response);
+	}
 
-    @Override
-    public CancellableInputStream sendPost(URL url, Map<String, String> postData, ResponseValues response)
-        throws IOException, URISyntaxException
-    {
-        assert !EventQueue.isDispatchThread();
-        assert !Platform.isFxApplicationThread();
+	@Override
+	public CancellableInputStream sendPost(URL url, Map<String, String> postData, ResponseValues response)
+			throws IOException, URISyntaxException {
+		assert !EventQueue.isDispatchThread();
+		assert !Platform.isFxApplicationThread();
 
-        return myRequestorProvider.getPostRequestor().sendPost(url, postData, response);
-    }
+		return myRequestorProvider.getPostRequestor().sendPost(url, postData, response);
+	}
 
-    @Override
-    public void setBufferSize(int bufferSize)
-    {
-        myRequestorProvider.setBufferSize(bufferSize);
-    }
+	@Override
+	public void setBufferSize(int bufferSize) {
+		myRequestorProvider.setBufferSize(bufferSize);
+	}
 
-    @Override
-    public void setTimeouts(int readTimeout, int connectTimeout)
-    {
-        myRequestorProvider.setTimeouts(readTimeout, connectTimeout);
-    }
+	@Override
+	public void setTimeouts(int readTimeout, int connectTimeout) {
+		myRequestorProvider.setTimeouts(readTimeout, connectTimeout);
+	}
+
+	@Override
+	public CancellableInputStream postFile(URL postToURL, File fileToPost, ResponseValues response,
+			Map<String, String> extraHeaderValues) throws IOException, URISyntaxException {
+		assert !EventQueue.isDispatchThread();
+		assert !Platform.isFxApplicationThread();
+		//working on 
+		return myRequestorProvider.getFilePoster().postFileToServer(postToURL, fileToPost, response,extraHeaderValues);
+	}
 }
