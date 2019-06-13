@@ -74,7 +74,7 @@ public interface HttpServer
      * @throws URISyntaxException Thrown if an error occurs converting the URL
      *             to a URI.
      */
-    CancellableInputStream postFile(URL postToURL, File fileToPost, ResponseValues response,Map<String, String> extraHeaderValues)
+    CancellableInputStream postJIRAFile(URL postToURL, File fileToPost, ResponseValues response,Map<String, String> extraHeaderValues)
             throws IOException, URISyntaxException;
 
     /**

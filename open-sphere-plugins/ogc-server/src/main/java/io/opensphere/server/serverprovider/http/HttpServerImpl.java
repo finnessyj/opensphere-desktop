@@ -239,11 +239,10 @@ public class HttpServerImpl implements HttpServer {
 	}
 
 	@Override
-	public CancellableInputStream postFile(URL postToURL, File fileToPost, ResponseValues response,
+	public CancellableInputStream postJIRAFile(URL postToURL, File fileToPost, ResponseValues response,
 			Map<String, String> extraHeaderValues) throws IOException, URISyntaxException {
 		assert !EventQueue.isDispatchThread();
 		assert !Platform.isFxApplicationThread();
-		//working on 
-		return myRequestorProvider.getFilePoster().postFileToServer(postToURL, fileToPost, response,extraHeaderValues);
+		return myRequestorProvider.getFilePoster().postFileToJIRAServer(postToURL, fileToPost, response, extraHeaderValues);
 	}
 }

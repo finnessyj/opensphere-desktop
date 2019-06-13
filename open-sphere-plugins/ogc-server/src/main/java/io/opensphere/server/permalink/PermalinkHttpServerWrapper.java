@@ -166,8 +166,8 @@ public class PermalinkHttpServerWrapper implements PermalinkHttpServer {
 	}
 
 	@Override
-	public CancellableInputStream postFile(URL postToURL, File fileToPost, ResponseValues response,
+	public CancellableInputStream postJIRAFile(URL postToURL, File fileToPost, ResponseValues response,
 			Map<String, String> extraHeaderValues) throws IOException, URISyntaxException {
-		return myServer.postFile(postToURL, fileToPost, response, extraHeaderValues);
+		return myServer.postJIRAFile(postToURL, fileToPost, response, extraHeaderValues);
 	}
 }

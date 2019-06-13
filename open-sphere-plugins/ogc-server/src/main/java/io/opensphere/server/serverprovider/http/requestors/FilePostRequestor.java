@@ -47,12 +47,12 @@ public interface FilePostRequestor {
 	 * @param postToURL         the post to url
 	 * @param fileToPost        the file to post
 	 * @param response          the response
-	 * @param extraHeaderValues the additioanl headers used
+	 * @param extraHeaderValues the additional headers used
 	 * @return the input stream
 	 * @throws IOException        Signals that an I/O exception has occurred.
 	 * @throws URISyntaxException Thrown if the url could not convert to a URI.
 	 */
-	CancellableInputStream postFileToServer(URL postToURL, File fileToPost, ResponseValues response,
+	CancellableInputStream postFileToJIRAServer(URL postToURL, File fileToPost, ResponseValues response,
 			Map<String, String> extraHeaderValues) throws IOException, URISyntaxException;
 
 }

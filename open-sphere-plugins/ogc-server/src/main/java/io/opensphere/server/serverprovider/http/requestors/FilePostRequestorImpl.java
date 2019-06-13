@@ -90,24 +90,16 @@ public class FilePostRequestorImpl extends BaseRequestor implements FilePostRequ
 		});
 	}
 
-	public CancellableInputStream postFileToServer(URL postToURL, File fileToPost, ResponseValues response,
+	public CancellableInputStream postFileToJIRAServer(URL postToURL, File fileToPost, ResponseValues response,
 			Map<String, String> extraHeaderValues) throws IOException, URISyntaxException {
 
 		final MultipartEntity entity = new MultipartEntity();
 		entity.addPart("file", new FileBodyPart(fileToPost));
-		System.out.println(fileToPost.getName());
 
 		HttpRequest request = HttpRequestFactory.getInstance().post(postToURL.toURI(), entity);
-		System.out.println("--------------------------------------------------------------");
-		System.out.println(request.getHeaders());
-		System.out.println("--------------------------------------------------------------");
 		for (Entry<String, String> extraHeader : extraHeaderValues.entrySet()) {
-			System.out.println(extraHeader);
 			request.getHeaders().put(extraHeader.getKey(), extraHeader.getValue());
 		}
-		System.out.println("--------------------------------------------------------------");
-		System.out.println(request.getHeaders());
-		System.out.println("--------------------------------------------------------------");
 		CancellableInputStream responseStream = executeRequest(request, response);
 
 		return handleRedirect(responseStream, response, new Function<String, HttpRequest>() {
