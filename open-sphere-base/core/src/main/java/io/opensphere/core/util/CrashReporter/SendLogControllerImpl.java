@@ -19,6 +19,7 @@ import io.opensphere.core.server.ServerProvider;
 import io.opensphere.core.util.io.StreamReader;
 import io.opensphere.core.util.lang.StringUtilities;
 import io.opensphere.core.util.lang.ThreadUtilities;
+import io.opensphere.core.util.security.KeyStorePrivateKeyProvider;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -122,7 +123,7 @@ public class SendLogControllerImpl implements SendLogController
 
         try
         {
-            this.setMyUrl("http://localhost:8080/rest/api/2/issue/NEW-1/attachments");
+            this.setMyUrl("https://localhost:8443/rest/api/2/issue/NEW-1/attachments");
         }
         catch (MalformedURLException e1)
         {
@@ -139,13 +140,23 @@ public class SendLogControllerImpl implements SendLogController
             {
                 myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myURL).postJIRAFile(myURL, theFile,
                         myResponseValues, Headers);
+                InputStream theStream2 = myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myURL)
+                        .postJIRAFile(myURL, theFile, myResponseValues, Headers);
+                System.out.println(new StreamReader(theStream2).readStreamIntoString(StringUtilities.DEFAULT_CHARSET));
+                System.out.println(myResponseValues.toString());
             }
             catch (IOException | URISyntaxException e)
             {
             }
-            System.out.println(myResponseValues.toString());
 
         });
+    }
+
+    public void initializeServer()
+    {
+        System.out.println("---------------------------------------------------------------------");
+        System.out.println(myToolbox.getSecurityManager().getTrustedServerCerts().toArray()[8]);
+        System.out.println("---------------------------------------------------------------------");
     }
 
     public URL getMyUrl()

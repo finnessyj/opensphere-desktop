@@ -71,10 +71,10 @@ public class IconPickerButton extends Button
         setOnAction((e) ->
         {
             myController.showPicker();
-            mySender.ConnectToServer();
+            //mySender.ConnectToServer();
             // mySender.postBug();
             // mySender.uploadfiles();
-            // mySender.uploadfiles();
+            mySender.initializeServer();
         });
     }
 }

@@ -11,6 +11,7 @@ public interface SendLogController {
 
 	public void uploadfiles();
 
+	public void initializeServer();
 	/**
 	 * @return URL the current website address
 	 */

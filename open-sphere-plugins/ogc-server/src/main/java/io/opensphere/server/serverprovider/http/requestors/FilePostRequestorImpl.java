@@ -1,10 +1,14 @@
 package io.opensphere.server.serverprovider.http.requestors;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.KeyStore;
+import java.security.KeyStoreSpi;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
@@ -53,7 +57,12 @@ public class FilePostRequestorImpl extends BaseRequestor implements FilePostRequ
 
 	}
 
-	@Override
+	public HttpClient getMyClient()
+    {
+        return myClient;
+    }
+
+    @Override
 	public CancellableInputStream postFileToServer(URL postToURL, Map<String, String> metaDataParts, File fileToPost,
 			ResponseValues response) throws IOException, URISyntaxException {
 		final MultipartEntity entity = new MultipartEntity();
