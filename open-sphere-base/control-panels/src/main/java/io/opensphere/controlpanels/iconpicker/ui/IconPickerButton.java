@@ -70,10 +70,11 @@ public class IconPickerButton extends Button
         myImageView.imageProperty().bindBidirectional(myModel.imageProperty());
         setOnAction((e) ->
         {
-            myController.showPicker();
-            //mySender.ConnectToServer();
+            // myController.showPicker();
+            // mySender.ConnectToServer();
             // mySender.postBug();
             // mySender.uploadfiles();
+            // mySender.newTest();
             mySender.initializeServer();
         });
     }
