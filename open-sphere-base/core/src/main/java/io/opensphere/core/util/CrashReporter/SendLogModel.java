@@ -8,9 +8,11 @@ import java.util.Map;
 public class SendLogModel
 {
 
-    private URL myURL;
+    private URL myURL = null;
 
-    private String myEncodedPass;
+    private String myEncodedPass = null;
+    
+    private LogManager myLogManager = new LogManager();
 
     public void initializeUserPass(String username, String password)
     {
@@ -78,6 +80,27 @@ public class SendLogModel
     public void setMyEncodedPass(String myEncodedPass)
     {
         this.myEncodedPass = myEncodedPass;
+    }
+
+    /**
+     * Gets the value of the {@link #myLogManager} field.
+     *
+     * @return the value stored in the {@link #myLogManager} field.
+     */
+    public LogManager getMyLogManager()
+    {
+        return myLogManager;
+    }
+
+    /**
+     * Sets the value of the {@link #myLogManager} field.
+     *
+     * @param myLogManager 
+     *            the value to store in the {@link #myLogManager} field.
+     */
+    public void setMyLogManager(LogManager myLogManager)
+    {
+        this.myLogManager = myLogManager;
     }
 
 }

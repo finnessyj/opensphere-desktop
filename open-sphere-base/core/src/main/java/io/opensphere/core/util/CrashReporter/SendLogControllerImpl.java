@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -43,9 +44,9 @@ public class SendLogControllerImpl implements SendLogController
 
     private static final Logger myLOGGER = Logger.getLogger(SendLogControllerImpl.class);
 
-    private URL myURL;
-
     private final SendLogModel myModel = new SendLogModel();
+
+    private Future<?> theTracker;
 
     /**
      * Constructs a new controller.
@@ -58,7 +59,7 @@ public class SendLogControllerImpl implements SendLogController
         myToolbox = toolbox;
 
         // HIGHSIDE: This will need to be linked to local users password
-        // --> Reccommend adding in a Map<String,String> to the function call of
+        // --> Recommend adding in a Map<String,String> to the function call of
         // SendLogControllerImpl
         // to get this information
         myModel.initializeUserPass("Admin1", "Boulder20!");
@@ -126,14 +127,12 @@ public class SendLogControllerImpl implements SendLogController
             try
             {
                 String string = new String(
-                        "{\n\"fields\":{\n\"project\": \n\n{\n    \"key\":\"BUGS\"\n},\n\"summary\":\"Send From MIST with SSL\",\n\"issuetype\": "
-                                + "{\n    \"name\": \"Task\"\n    }\n}\n}");
+                        "{\n\"fields\": {\n \"project\": {\n \"key\": \"BUGS\"\n },\n \"summary\":"
+                        + " \"Send From MIST\",\n \"issuetype\": {\n \"name\": \"Task\"\n },\n \"reporter\":"
+                        + " {\n \"name\": \"Admin1\"\n }\n}\n}\n\n");
                 InputStream postData = new ByteArrayInputStream(string.getBytes());
-                InputStream theStream2 = myToolbox.getServerProviderRegistry().getProvider(HttpServer.class)
-                        .getServer(myModel.getMyUrl())
+                myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myModel.getMyUrl())
                         .sendPost(myModel.getMyUrl(), postData, myModel.getPostHeaders(), myResponseValues, ContentType.JSON);
-                System.out.println(new StreamReader(theStream2).readStreamIntoString(StringUtilities.DEFAULT_CHARSET));
-
             }
             catch (IOException | URISyntaxException e)
             {
@@ -145,24 +144,31 @@ public class SendLogControllerImpl implements SendLogController
 
     public void uploadfiles()
     {
-
-        myModel.setMyUrl("https://localhost:8443/rest/api/2/issue/NEW-1/attachments");
-
+        myModel.getMyLogManager().getLogs();
+        myModel.setMyUrl("https://localhost:8443/rest/api/2/issue/BUGS/attachments");
         ExecutorService test = Executors.newCachedThreadPool(new NamedThreadFactory("IO-Worker"));
-        Future<?> theTracker = test.submit(() ->
+        for (int idx = 0; idx < 2; idx++)
         {
-
-            File theFile = new File("/home/crombiek/Desktop/it.JSON");
-            try
+            System.out.println("---------------------------------------------");
+            if ((idx >= 0) && (idx < myModel.getMyLogManager().getLogs().size()))
             {
-                myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myModel.getMyUrl())
-                        .postJIRAFile(myModel.getMyUrl(), theFile, myResponseValues, myModel.getFileUploadHeaders());
-            }
-            catch (IOException | URISyntaxException e)
-            {
+                System.out.println(myModel.getMyLogManager().getLogs().get(idx).getName());
+                File theFile = myModel.getMyLogManager().getLogs().get(idx);
+                theTracker = test.submit(() ->
+                {
+                    try
+                    {
+                        myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myModel.getMyUrl())
+                                .postJIRAFile(myModel.getMyUrl(), theFile, myResponseValues, myModel.getFileUploadHeaders());
+                    }
+                    catch (IOException | URISyntaxException e)
+                    {
+                        e.printStackTrace();
+                    }
+                });
             }
 
-        });
+        }
         test.shutdown();
         connectionNotify(theTracker);
     }
