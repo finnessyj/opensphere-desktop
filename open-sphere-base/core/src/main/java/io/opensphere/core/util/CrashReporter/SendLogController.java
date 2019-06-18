@@ -12,15 +12,5 @@ public interface SendLogController {
 	public void uploadfiles();
 
 	public void initializeServer();
-	/**
-	 * @return URL the current website address
-	 */
-	public URL getMyUrl();
-
-	/**
-	 * @param theURL the url for the JIRA Host Server
-	 * @throws MalformedURLException
-	 */
-	public URL setMyUrl(String theURL) throws MalformedURLException;
 
 }

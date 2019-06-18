@@ -45,6 +45,8 @@ public class SendLogControllerImpl implements SendLogController
 
     private URL myURL;
 
+    private final SendLogModel myModel = new SendLogModel();
+
     /**
      * Constructs a new controller.
      *
@@ -54,27 +56,26 @@ public class SendLogControllerImpl implements SendLogController
     public SendLogControllerImpl(Toolbox toolbox)
     {
         myToolbox = toolbox;
+
+        // HIGHSIDE: This will need to be linked to local users password
+        // --> Reccommend adding in a Map<String,String> to the function call of
+        // SendLogControllerImpl
+        // to get this information
+        myModel.initializeUserPass("Admin1", "Boulder20!");
     }
 
     public boolean ConnectToServer()
     {
 
-        try
-        {
-            this.setMyUrl("https://localhost:8443");
-        }
-        catch (MalformedURLException e1)
-        {
-        }
-
+        myModel.setMyUrl("https://localhost:8443");
         ExecutorService test = Executors.newCachedThreadPool(new NamedThreadFactory("IO-Worker"));
         Future<?> theTracker = test.submit(() ->
         {
 
             try
             {
-                myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myURL).sendGet(myURL,
-                        myResponseValues);
+                myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myModel.getMyUrl())
+                        .sendGet(myModel.getMyUrl(), myResponseValues);
             }
             catch (IOException | URISyntaxException e)
             {
@@ -118,16 +119,7 @@ public class SendLogControllerImpl implements SendLogController
 
     public void postBug()
     {
-        try
-        {
-            this.setMyUrl("https://localhost:8443/rest/api/2/issue");
-        }
-        catch (MalformedURLException e1)
-        {
-            e1.printStackTrace();
-        }
-        Map<String, String> Headers = Map.ofEntries(Map.entry("Content-Type", "application/json"),
-                Map.entry("Authorization", "Basic QWRtaW4xOkJvdWxkZXIyMCE="));
+        myModel.setMyUrl("https://localhost:8443/rest/api/2/issue");
         ExecutorService test = Executors.newCachedThreadPool(new NamedThreadFactory("IO-Worker"));
         Future<?> theTracker = test.submit(() ->
         {
@@ -137,8 +129,9 @@ public class SendLogControllerImpl implements SendLogController
                         "{\n\"fields\":{\n\"project\": \n\n{\n    \"key\":\"BUGS\"\n},\n\"summary\":\"Send From MIST with SSL\",\n\"issuetype\": "
                                 + "{\n    \"name\": \"Task\"\n    }\n}\n}");
                 InputStream postData = new ByteArrayInputStream(string.getBytes());
-                InputStream theStream2 = myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myURL)
-                        .sendPost(myURL, postData, Headers, myResponseValues, ContentType.JSON);
+                InputStream theStream2 = myToolbox.getServerProviderRegistry().getProvider(HttpServer.class)
+                        .getServer(myModel.getMyUrl())
+                        .sendPost(myModel.getMyUrl(), postData, myModel.getPostHeaders(), myResponseValues, ContentType.JSON);
                 System.out.println(new StreamReader(theStream2).readStreamIntoString(StringUtilities.DEFAULT_CHARSET));
 
             }
@@ -153,55 +146,31 @@ public class SendLogControllerImpl implements SendLogController
     public void uploadfiles()
     {
 
-        try
-        {
-            this.setMyUrl("https://localhost:8443/rest/api/2/issue/NEW-1/attachments");
-        }
-        catch (MalformedURLException e1)
-        {
-        }
+        myModel.setMyUrl("https://localhost:8443/rest/api/2/issue/NEW-1/attachments");
 
-        Map<String, String> Headers = Map.ofEntries(Map.entry("X-Atlassian-Token", "no-check"),
-                Map.entry("Authorization", "Basic QWRtaW4xOkJvdWxkZXIyMCE="));
-
-        ThreadUtilities.runBackground(() ->
+        ExecutorService test = Executors.newCachedThreadPool(new NamedThreadFactory("IO-Worker"));
+        Future<?> theTracker = test.submit(() ->
         {
 
             File theFile = new File("/home/crombiek/Desktop/it.JSON");
             try
             {
-                myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myURL).postJIRAFile(myURL, theFile,
-                        myResponseValues, Headers);
-                InputStream theStream2 = myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myURL)
-                        .postJIRAFile(myURL, theFile, myResponseValues, Headers);
-                System.out.println(new StreamReader(theStream2).readStreamIntoString(StringUtilities.DEFAULT_CHARSET));
-                System.out.println(myResponseValues.toString());
+                myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myModel.getMyUrl())
+                        .postJIRAFile(myModel.getMyUrl(), theFile, myResponseValues, myModel.getFileUploadHeaders());
             }
             catch (IOException | URISyntaxException e)
             {
             }
 
         });
+        test.shutdown();
+        connectionNotify(theTracker);
     }
 
     public void initializeServer()
     {
-        String originalInput = "Admin1:Boulder20!";
-        String encodedString = Base64.getEncoder().encodeToString(originalInput.getBytes());
+        myModel.setMyUrl("https://localhost:8443/rest/api/2/issue");
 
-        // byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
-        // String decodedString = new String(decodedBytes);
-
-        try
-        {
-            this.setMyUrl("https://localhost:8443/rest/api/2/issue/NEW-1/attachments");
-        }
-        catch (MalformedURLException e1)
-        {
-        }
-
-        Map<String, String> Headers = Map.ofEntries(Map.entry("X-Atlassian-Token", "no-check"),
-                Map.entry("Authorization", "Basic " + encodedString));
         ExecutorService test = Executors.newCachedThreadPool(new NamedThreadFactory("IO-Worker"));
         Future<?> theTracker = test.submit(() ->
         {
@@ -211,8 +180,9 @@ public class SendLogControllerImpl implements SendLogController
                         "{\n\"fields\":{\n\"project\": \n\n{\n    \"key\":\"BUGS\"\n},\n\"summary\":\"Send From MIST with SSL\",\n\"issuetype\": "
                                 + "{\n    \"name\": \"Task\"\n    }\n}\n}");
                 InputStream postData = new ByteArrayInputStream(string.getBytes());
-              myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myURL)
-                        .sendPost(myURL, postData, Headers, myResponseValues, ContentType.JSON);
+                myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myModel.getMyUrl())
+                        .sendPost(myModel.getMyUrl(), postData, myModel.getPostHeaders(), myResponseValues, ContentType.JSON);
+
             }
             catch (IOException | URISyntaxException e)
             {
@@ -220,17 +190,6 @@ public class SendLogControllerImpl implements SendLogController
         });
         test.shutdown();
         connectionNotify(theTracker);
-
     }
 
-    public URL getMyUrl()
-    {
-        return myURL;
-    }
-
-    public URL setMyUrl(String string) throws MalformedURLException
-    {
-        myURL = new URL(string);
-        return myURL;
-    }
 }
