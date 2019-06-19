@@ -1,10 +1,12 @@
 package io.opensphere.core.util.CrashReporter;
 
+import org.json.simple.JSONObject;
+
 public interface SendLogController {
 
 	public boolean ConnectToServer();
 
-	public void postBug();
+	public JSONObject postBug();
 
 	public void uploadfiles();
 

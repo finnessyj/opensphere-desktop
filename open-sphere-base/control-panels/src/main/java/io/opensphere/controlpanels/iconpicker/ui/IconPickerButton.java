@@ -7,6 +7,7 @@ import io.opensphere.controlpanels.iconpicker.controller.IconPickerController;
 import io.opensphere.controlpanels.iconpicker.model.IconPickerModel;
 import io.opensphere.core.Toolbox;
 import io.opensphere.core.util.CrashReporter.SendLogControllerImpl;
+import io.opensphere.core.util.CrashReporter.SendLogModel;
 import javafx.beans.property.LongProperty;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
@@ -32,7 +33,7 @@ public class IconPickerButton extends Button
      */
     private final IconPickerModel myModel;
 
-    private SendLogControllerImpl mySender;
+    private SendLogModel mySendModel;
 
     /**
      * Constructs a new icon picker button.
@@ -62,7 +63,7 @@ public class IconPickerButton extends Button
 
         myModel = new IconPickerModel(iconIdProperty);
         myController = new IconPickerController(toolbox, displayer, myModel);
-        mySender = new SendLogControllerImpl(toolbox);
+        mySendModel = new SendLogModel(toolbox);
 
         myImageView.setFitHeight(16);
         myImageView.setFitWidth(16);
@@ -72,7 +73,7 @@ public class IconPickerButton extends Button
         {
             // myController.showPicker();
             // mySender.ConnectToServer();
-            mySender.postBug();
+            mySendModel.getSendControl().postBug();
             // mySender.uploadfiles();
             // mySender.initializeServer();
         });

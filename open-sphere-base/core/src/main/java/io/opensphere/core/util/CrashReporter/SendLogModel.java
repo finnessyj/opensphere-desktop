@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.Base64;
 import java.util.Map;
 
+import io.opensphere.core.Toolbox;
+
 public class SendLogModel
 {
 
@@ -12,20 +14,35 @@ public class SendLogModel
 
     private String myEncodedPass = null;
     
-    private LogManager myLogManager = new LogManager();
+    private final Toolbox myToolbox;
+    
+    private LogManager myLogManager = new LogManager(this);
+    
+    private SendLogControllerImpl mySendControl = new SendLogControllerImpl(this);
+    
+    private CrashMonitor myCrashMonitor = new CrashMonitor(this);
+    
+    public SendLogModel(Toolbox theToolBox) {
+        myToolbox = theToolBox;
+    }
+
+    public Toolbox getToolbox()
+    {
+        return myToolbox;
+    }
 
     public void initializeUserPass(String username, String password)
     {
 
         String originalInput = (username + ":" + password);
         String encodedUserPass = Base64.getEncoder().encodeToString(originalInput.getBytes());
-        setMyEncodedPass(encodedUserPass);
+        setEncodedPass(encodedUserPass);
     }
 
     /**
      * @return URL the current website address
      */
-    public URL getMyUrl()
+    public URL getUrl()
     {
         return myURL;
     }
@@ -33,7 +50,7 @@ public class SendLogModel
     /**
      * @param theURL the url for the JIRA Host Server
      */
-    public URL setMyUrl(String string)
+    public URL setUrl(String string)
     {
         try
         {
@@ -66,7 +83,7 @@ public class SendLogModel
      *
      * @return the value stored in the {@link #myEncodedPass} field.
      */
-    public String getMyEncodedPass()
+    public String getEncodedPass()
     {
         return myEncodedPass;
     }
@@ -77,7 +94,7 @@ public class SendLogModel
      * @param myEncodedPass the value to store in the {@link #myEncodedPass}
      *            field.
      */
-    public void setMyEncodedPass(String myEncodedPass)
+    public void setEncodedPass(String myEncodedPass)
     {
         this.myEncodedPass = myEncodedPass;
     }
@@ -87,7 +104,7 @@ public class SendLogModel
      *
      * @return the value stored in the {@link #myLogManager} field.
      */
-    public LogManager getMyLogManager()
+    public LogManager getLogManager()
     {
         return myLogManager;
     }
@@ -98,9 +115,51 @@ public class SendLogModel
      * @param myLogManager 
      *            the value to store in the {@link #myLogManager} field.
      */
-    public void setMyLogManager(LogManager myLogManager)
+    public void setLogManager(LogManager myLogManager)
     {
         this.myLogManager = myLogManager;
+    }
+
+    /**
+     * Gets the value of the {@link #myCrashMonitor} field.
+     *
+     * @return the value stored in the {@link #myCrashMonitor} field.
+     */
+    public CrashMonitor getCrashMonitor()
+    {
+        return myCrashMonitor;
+    }
+
+    /**
+     * Sets the value of the {@link #myCrashMonitor} field.
+     *
+     * @param myCrashMonitor 
+     *            the value to store in the {@link #myCrashMonitor} field.
+     */
+    public void setCrashMonitor(CrashMonitor myCrashMonitor)
+    {
+        this.myCrashMonitor = myCrashMonitor;
+    }
+
+    /**
+     * Gets the value of the {@link #mySendControl} field.
+     *
+     * @return the value stored in the {@link #mySendControl} field.
+     */
+    public SendLogControllerImpl getSendControl()
+    {
+        return mySendControl;
+    }
+
+    /**
+     * Sets the value of the {@link #mySendControl} field.
+     *
+     * @param mySendControl 
+     *            the value to store in the {@link #mySendControl} field.
+     */
+    public void setSendControl(SendLogControllerImpl mySendControl)
+    {
+        this.mySendControl = mySendControl;
     }
 
 }
