@@ -50,7 +50,7 @@ public class SendLogControllerImpl implements SendLogController
 
     private Toolbox myToolbox;
 
-    private SendLogModel myModel;
+    private SendLogModel myModel = new SendLogModel();
 
     /**
      * Constructs a new controller.
@@ -208,9 +208,11 @@ public class SendLogControllerImpl implements SendLogController
 
                 InputStream postData = myToolbox.getServerProviderRegistry().getProvider(HttpServer.class)
                         .getServer(myModel.getUrl()).sendGet(myModel.getUrl(), myResponseValues);
+                
                 System.out.println("---------------------------------------------");
                 System.out.println(new StreamReader(postData).readStreamIntoString(StringUtilities.DEFAULT_CHARSET));
                 System.out.println("---------------------------------------------");
+                
                 myResponseJSON = (JSONObject)new JSONParser().parse(new InputStreamReader(postData, "UTF-8"));
             }
             catch (IOException | URISyntaxException | ParseException e)

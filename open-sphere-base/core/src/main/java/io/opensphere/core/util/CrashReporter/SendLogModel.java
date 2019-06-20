@@ -5,7 +5,6 @@ import java.net.URL;
 import java.util.Base64;
 import java.util.Map;
 
-import io.opensphere.core.Toolbox;
 
 public class SendLogModel
 {
@@ -14,20 +13,12 @@ public class SendLogModel
 
     private String myEncodedPass = null;
 
-    private final Toolbox myToolbox;
-
     private LogManager myLogManager = new LogManager();
 
     private CrashMonitor myCrashMonitor = new CrashMonitor();
 
-    public SendLogModel(Toolbox theToolBox)
+    public SendLogModel()
     {
-        myToolbox = theToolBox;
-    }
-
-    public Toolbox getToolbox()
-    {
-        return myToolbox;
     }
 
     public void initializeUserPass(String username, String password)
