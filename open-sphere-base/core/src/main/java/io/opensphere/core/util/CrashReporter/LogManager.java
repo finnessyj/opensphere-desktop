@@ -50,7 +50,9 @@ public class LogManager
             // For creating Task
             eat.append("{\"fields\":{\"project\":{");
             eat.append("\"key\":" + "\"" + projectName + "\"" + "},\"summary\": \" " + summOfBug + " \",");
-            eat.append("\"issuetype\": {\"name\":\"Task\"}}}");
+            eat.append("\"issuetype\": {\"name\":\"Task\"},");
+             eat.append("\"customfield_10209\": \"phone number\",");
+            eat.append("\"description\": \"64444\"}}");
         }
         else
         {
@@ -60,10 +62,11 @@ public class LogManager
             summOfBug = new String("\"This is the subtask\"");
 
             eat.append("{\"fields\": {\"project\": {\"key\":" + "\"" + projectName + "\"" + "}, \"parent\": { " + "\"id\":" + id
-                    + "}, \"summary\":" + summOfBug + ",\"description\": \"shit\", \"issuetype\": {\"name\": \"Sub-task\" }}}");
-
+                    + "}, \"summary\":" + summOfBug
+                    + ",\"description\": \"some description\", \"issuetype\": {\"name\": \"Sub-task\" }}}");
+            System.out.println(eat.toString());
         }
-
+        System.out.println(eat);
         InputStream postData = new ByteArrayInputStream(eat.toString().getBytes());
         return postData;
     }

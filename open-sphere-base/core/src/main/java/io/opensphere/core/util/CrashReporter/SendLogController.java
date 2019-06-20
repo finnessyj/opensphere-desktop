@@ -9,7 +9,8 @@ public interface SendLogController {
 	public JSONObject postBug();
 
 	public void uploadfiles();
+	
 
-	public void initializeServer();
+	public void checkIssueStatus();
 
 }
