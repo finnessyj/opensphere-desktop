@@ -12,11 +12,9 @@ import io.opensphere.core.util.lang.StringUtilities;
 
 public class LogManager
 {
-    private SendLogModel mySendLogModel;
 
-    public LogManager(SendLogModel theSendModel)
+    public LogManager()
     {
-        mySendLogModel = theSendModel;
     }
 
     public List<File> getLogs()

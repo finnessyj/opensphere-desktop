@@ -13,16 +13,15 @@ public class SendLogModel
     private URL myURL = null;
 
     private String myEncodedPass = null;
-    
+
     private final Toolbox myToolbox;
-    
-    private LogManager myLogManager = new LogManager(this);
-    
-    private SendLogControllerImpl mySendControl = new SendLogControllerImpl(this);
-    
-    private CrashMonitor myCrashMonitor = new CrashMonitor(this);
-    
-    public SendLogModel(Toolbox theToolBox) {
+
+    private LogManager myLogManager = new LogManager();
+
+    private CrashMonitor myCrashMonitor = new CrashMonitor();
+
+    public SendLogModel(Toolbox theToolBox)
+    {
         myToolbox = theToolBox;
     }
 
@@ -112,8 +111,8 @@ public class SendLogModel
     /**
      * Sets the value of the {@link #myLogManager} field.
      *
-     * @param myLogManager 
-     *            the value to store in the {@link #myLogManager} field.
+     * @param myLogManager the value to store in the {@link #myLogManager}
+     *            field.
      */
     public void setLogManager(LogManager myLogManager)
     {
@@ -133,33 +132,11 @@ public class SendLogModel
     /**
      * Sets the value of the {@link #myCrashMonitor} field.
      *
-     * @param myCrashMonitor 
-     *            the value to store in the {@link #myCrashMonitor} field.
+     * @param myCrashMonitor the value to store in the {@link #myCrashMonitor}
+     *            field.
      */
     public void setCrashMonitor(CrashMonitor myCrashMonitor)
     {
         this.myCrashMonitor = myCrashMonitor;
     }
-
-    /**
-     * Gets the value of the {@link #mySendControl} field.
-     *
-     * @return the value stored in the {@link #mySendControl} field.
-     */
-    public SendLogControllerImpl getSendControl()
-    {
-        return mySendControl;
-    }
-
-    /**
-     * Sets the value of the {@link #mySendControl} field.
-     *
-     * @param mySendControl 
-     *            the value to store in the {@link #mySendControl} field.
-     */
-    public void setSendControl(SendLogControllerImpl mySendControl)
-    {
-        this.mySendControl = mySendControl;
-    }
-
 }

@@ -58,10 +58,9 @@ public class SendLogControllerImpl implements SendLogController
      * @param toolbox The system toolbox.
      * @throws MalformedURLException
      */
-    public SendLogControllerImpl(SendLogModel theModel)
+    public SendLogControllerImpl(Toolbox toolbox)
     {
-        myModel = theModel;
-        myToolbox = theModel.getToolbox();
+        myToolbox = toolbox;
 
         // HIGHSIDE: This will need to be linked to local users password
         // --> Recommend adding in a Map<String,String> to the function call of

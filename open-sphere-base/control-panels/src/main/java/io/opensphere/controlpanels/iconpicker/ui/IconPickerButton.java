@@ -33,7 +33,7 @@ public class IconPickerButton extends Button
      */
     private final IconPickerModel myModel;
 
-    private SendLogModel mySendModel;
+    private SendLogControllerImpl mySendModel;
 
     /**
      * Constructs a new icon picker button.
@@ -63,7 +63,7 @@ public class IconPickerButton extends Button
 
         myModel = new IconPickerModel(iconIdProperty);
         myController = new IconPickerController(toolbox, displayer, myModel);
-        mySendModel = new SendLogModel(toolbox);
+        mySendModel = new SendLogControllerImpl(toolbox);
 
         myImageView.setFitHeight(16);
         myImageView.setFitWidth(16);
@@ -71,10 +71,11 @@ public class IconPickerButton extends Button
         myImageView.imageProperty().bindBidirectional(myModel.imageProperty());
         setOnAction((e) ->
         {
+            
             // myController.showPicker();
             //mySender.ConnectToServer();
-            mySender.postBug();
-            mySender.checkIssueStatus();
+            mySendModel.postBug();
+            mySendModel.checkIssueStatus();
             // mySender.uploadfiles();
             // mySender.initializeServer();
         });
