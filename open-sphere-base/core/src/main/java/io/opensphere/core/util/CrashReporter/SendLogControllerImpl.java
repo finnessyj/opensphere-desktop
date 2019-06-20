@@ -4,9 +4,11 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Iterator;
@@ -18,6 +20,9 @@ import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpStatus;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import io.opensphere.core.Toolbox;
 import io.opensphere.core.server.ContentType;
@@ -48,6 +53,8 @@ public class SendLogControllerImpl implements SendLogController
 
     private Future<?> theTracker;
 
+    private JSONObject myResponseJSON;
+
     /**
      * Constructs a new controller.
      *
@@ -69,6 +76,7 @@ public class SendLogControllerImpl implements SendLogController
     {
 
         myModel.setMyUrl("https://localhost:8443");
+
         ExecutorService test = Executors.newCachedThreadPool(new NamedThreadFactory("IO-Worker"));
         Future<?> theTracker = test.submit(() ->
         {
@@ -108,6 +116,14 @@ public class SendLogControllerImpl implements SendLogController
                     status = false;
                     myLOGGER.info("Failed to connect to the JIRA Server, code: " + myResponseValues.getResponseCode());
                 }
+
+                if (!(Arrays.asList(FailCodes).contains(myResponseValues.getResponseCode()))
+                        && !(Arrays.asList(SuccessCodes).contains(myResponseValues.getResponseCode())))
+                {
+                    status = false;
+                    myLOGGER.info("Unknown JIRA exemeption, code: " + myResponseValues.getResponseCode());
+                }
+
                 return status;
             }
         }
@@ -118,7 +134,7 @@ public class SendLogControllerImpl implements SendLogController
         return status;
     }
 
-    public void postBug()
+    public JSONObject postBug()
     {
         myModel.setMyUrl("https://localhost:8443/rest/api/2/issue");
         ExecutorService test = Executors.newCachedThreadPool(new NamedThreadFactory("IO-Worker"));
@@ -126,20 +142,26 @@ public class SendLogControllerImpl implements SendLogController
         {
             try
             {
-                String string = new String(
-                        "{\n\"fields\": {\n \"project\": {\n \"key\": \"BUGS\"\n },\n \"summary\":"
-                        + " \"Send From MIST\",\n \"issuetype\": {\n \"name\": \"Task\"\n },\n \"reporter\":"
-                        + " {\n \"name\": \"Admin1\"\n }\n}\n}\n\n");
-                InputStream postData = new ByteArrayInputStream(string.getBytes());
-                myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myModel.getMyUrl())
-                        .sendPost(myModel.getMyUrl(), postData, myModel.getPostHeaders(), myResponseValues, ContentType.JSON);
+
+                InputStream theStream = myToolbox.getServerProviderRegistry().getProvider(HttpServer.class)
+                        .getServer(myModel.getMyUrl()).sendPost(myModel.getMyUrl(), myModel.getMyLogManager().getDatatoPost(null),
+                                myModel.getPostHeaders(), myResponseValues, ContentType.JSON);
+                myResponseJSON = (JSONObject)new JSONParser().parse(new InputStreamReader(theStream, "UTF-8"));
+
+                // Adds subtask to above task
+//                myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myModel.getMyUrl()).sendPost(
+//                        myModel.getMyUrl(), myModel.getMyLogManager().getDatatoPost(myResponseJSON), myModel.getPostHeaders(),
+//                        myResponseValues, ContentType.JSON);
+
             }
-            catch (IOException | URISyntaxException e)
+            catch (IOException | URISyntaxException | ParseException e)
             {
             }
         });
         test.shutdown();
         connectionNotify(theTracker);
+        checkIssueStatus();
+        return myResponseJSON;
     }
 
     public void uploadfiles()
@@ -158,10 +180,12 @@ public class SendLogControllerImpl implements SendLogController
                 {
                     try
                     {
-                        myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myModel.getMyUrl())
+                        InputStream theStream = myToolbox.getServerProviderRegistry().getProvider(HttpServer.class)
+                                .getServer(myModel.getMyUrl())
                                 .postJIRAFile(myModel.getMyUrl(), theFile, myResponseValues, myModel.getFileUploadHeaders());
+                        myResponseJSON = (JSONObject)new JSONParser().parse(new InputStreamReader(theStream, "UTF-8"));
                     }
-                    catch (IOException | URISyntaxException e)
+                    catch (IOException | URISyntaxException | ParseException e)
                     {
                         e.printStackTrace();
                     }
@@ -173,24 +197,24 @@ public class SendLogControllerImpl implements SendLogController
         connectionNotify(theTracker);
     }
 
-    public void initializeServer()
+    public void checkIssueStatus()
     {
-        myModel.setMyUrl("https://localhost:8443/rest/api/2/issue");
+        myModel.setMyUrl(myResponseJSON.get("self").toString());
 
         ExecutorService test = Executors.newCachedThreadPool(new NamedThreadFactory("IO-Worker"));
         Future<?> theTracker = test.submit(() ->
         {
             try
             {
-                String string = new String(
-                        "{\n\"fields\":{\n\"project\": \n\n{\n    \"key\":\"BUGS\"\n},\n\"summary\":\"Send From MIST with SSL\",\n\"issuetype\": "
-                                + "{\n    \"name\": \"Task\"\n    }\n}\n}");
-                InputStream postData = new ByteArrayInputStream(string.getBytes());
-                myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myModel.getMyUrl())
-                        .sendPost(myModel.getMyUrl(), postData, myModel.getPostHeaders(), myResponseValues, ContentType.JSON);
 
+                InputStream postData = myToolbox.getServerProviderRegistry().getProvider(HttpServer.class)
+                        .getServer(myModel.getMyUrl()).sendGet(myModel.getMyUrl(), myResponseValues);
+                System.out.println("---------------------------------------------");
+                System.out.println(new StreamReader(postData).readStreamIntoString(StringUtilities.DEFAULT_CHARSET));
+                System.out.println("---------------------------------------------");
+                  myResponseJSON = (JSONObject)new JSONParser().parse(new InputStreamReader(postData, "UTF-8"));
             }
-            catch (IOException | URISyntaxException e)
+            catch (IOException | URISyntaxException | ParseException e)
             {
             }
         });
