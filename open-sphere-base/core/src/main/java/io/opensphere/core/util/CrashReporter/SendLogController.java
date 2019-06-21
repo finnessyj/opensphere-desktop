@@ -1,5 +1,6 @@
 package io.opensphere.core.util.CrashReporter;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public interface SendLogController {
@@ -10,7 +11,6 @@ public interface SendLogController {
 
 	public void uploadfiles();
 	
-
 	public void checkIssueStatus();
 
 }

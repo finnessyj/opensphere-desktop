@@ -1,23 +1,19 @@
 package io.opensphere.core.util.CrashReporter;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jetty.http.HttpStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -26,9 +22,7 @@ import io.opensphere.core.Toolbox;
 import io.opensphere.core.server.ContentType;
 import io.opensphere.core.server.HttpServer;
 import io.opensphere.core.server.ResponseValues;
-import io.opensphere.core.util.io.StreamReader;
 import io.opensphere.core.util.lang.NamedThreadFactory;
-import io.opensphere.core.util.lang.StringUtilities;
 
 /**
  * Sends crash log files to the server. -eventually integrate to send to JIRA
@@ -198,7 +192,7 @@ public class SendLogControllerImpl implements SendLogController
     public void checkIssueStatus()
     {
 
-        myModel.setUrl(myResponseJSON.get("self").toString());
+        myModel.setUrl("https://localhost:8443/rest/api/2/issue/AC-21");
 
         ExecutorService test = Executors.newCachedThreadPool(new NamedThreadFactory("IO-Worker"));
         Future<?> theTracker = test.submit(() ->
@@ -207,13 +201,13 @@ public class SendLogControllerImpl implements SendLogController
             {
 
                 InputStream postData = myToolbox.getServerProviderRegistry().getProvider(HttpServer.class)
-                        .getServer(myModel.getUrl()).sendGet(myModel.getUrl(), myResponseValues);
-                
-                System.out.println("---------------------------------------------");
-                System.out.println(new StreamReader(postData).readStreamIntoString(StringUtilities.DEFAULT_CHARSET));
-                System.out.println("---------------------------------------------");
-                
+                        .getServer(myModel.getUrl()).sendGet(myModel.getUrl(), myModel.getFileUploadHeaders(), myResponseValues);
                 myResponseJSON = (JSONObject)new JSONParser().parse(new InputStreamReader(postData, "UTF-8"));
+
+                JSONObject theTest = (JSONObject)myResponseJSON.get("fields");
+                JSONObject theTest2 = (JSONObject)theTest.get("status");
+                System.out.println(theTest2.get("name").toString());
+
             }
             catch (IOException | URISyntaxException | ParseException e)
             {
