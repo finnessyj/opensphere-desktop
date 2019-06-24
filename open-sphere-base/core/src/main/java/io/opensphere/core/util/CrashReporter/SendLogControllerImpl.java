@@ -7,13 +7,15 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.LogEventListener;
+import org.apache.logging.log4j.status.StatusConsoleListener;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -55,7 +57,6 @@ public class SendLogControllerImpl implements SendLogController
     public SendLogControllerImpl(Toolbox toolbox)
     {
         myToolbox = toolbox;
-
         // HIGHSIDE: This will need to be linked to local users password
         // --> Recommend adding in a Map<String,String> to the function call of
         // SendLogControllerImpl

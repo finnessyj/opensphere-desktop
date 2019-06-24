@@ -2,12 +2,13 @@ package io.opensphere.controlpanels.iconpicker.ui;
 
 import java.net.MalformedURLException;
 
+import org.apache.log4j.Logger;
+
 import io.opensphere.controlpanels.iconpicker.controller.IconChooserDisplayer;
 import io.opensphere.controlpanels.iconpicker.controller.IconPickerController;
 import io.opensphere.controlpanels.iconpicker.model.IconPickerModel;
 import io.opensphere.core.Toolbox;
 import io.opensphere.core.util.CrashReporter.SendLogControllerImpl;
-import io.opensphere.core.util.CrashReporter.SendLogModel;
 import javafx.beans.property.LongProperty;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
@@ -71,11 +72,13 @@ public class IconPickerButton extends Button
         myImageView.imageProperty().bindBidirectional(myModel.imageProperty());
         setOnAction((e) ->
         {
-            
+
             // myController.showPicker();
-            //mySender.ConnectToServer();
-            //mySendModel.postBug();
+            // mySender.ConnectToServer();
+            // mySendModel.postBug();
             mySendModel.checkIssueStatus();
+            Logger theLogger = Logger.getLogger(IconPickerButton.class);
+
             // mySender.uploadfiles();
             // mySender.initializeServer();
         });
