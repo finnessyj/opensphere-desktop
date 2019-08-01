@@ -62,7 +62,6 @@ public class SendLogModel
 
     public Map<String, String> getFileUploadHeaders()
     {
-
         Map<String, String> Headers = Map.ofEntries(Map.entry("X-Atlassian-Token", "no-check"),
                 Map.entry("Authorization", "Basic " + myEncodedPass));
         return Headers;

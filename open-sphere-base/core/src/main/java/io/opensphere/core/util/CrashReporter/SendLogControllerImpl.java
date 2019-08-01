@@ -55,7 +55,6 @@ public class SendLogControllerImpl implements SendLogController
     public SendLogControllerImpl(Toolbox toolbox)
     {
         myToolbox = toolbox;
-
         // HIGHSIDE: This will need to be linked to local users password
         // --> Recommend adding in a Map<String,String> to the function call of
         // SendLogControllerImpl
@@ -65,13 +64,11 @@ public class SendLogControllerImpl implements SendLogController
 
     public boolean ConnectToServer()
     {
-
         myModel.setUrl("https://localhost:8443");
 
         ExecutorService test = Executors.newCachedThreadPool(new NamedThreadFactory("IO-Worker"));
         Future<?> theTracker = test.submit(() ->
         {
-
             try
             {
                 myToolbox.getServerProviderRegistry().getProvider(HttpServer.class).getServer(myModel.getUrl())
@@ -97,7 +94,6 @@ public class SendLogControllerImpl implements SendLogController
             if (theTask.get() == null)
             {
                 if (Arrays.asList(SuccessCodes).contains(myResponseValues.getResponseCode()))
-
                 {
                     status = true;
                     myLOGGER.info("Successfully Connected to the JIRA Server");
@@ -191,7 +187,6 @@ public class SendLogControllerImpl implements SendLogController
 
     public void checkIssueStatus()
     {
-
         myModel.setUrl("https://localhost:8443/rest/api/2/issue/AC-21");
 
         ExecutorService test = Executors.newCachedThreadPool(new NamedThreadFactory("IO-Worker"));
@@ -199,7 +194,6 @@ public class SendLogControllerImpl implements SendLogController
         {
             try
             {
-
                 InputStream postData = myToolbox.getServerProviderRegistry().getProvider(HttpServer.class)
                         .getServer(myModel.getUrl()).sendGet(myModel.getUrl(), myModel.getFileUploadHeaders(), myResponseValues);
                 myResponseJSON = (JSONObject)new JSONParser().parse(new InputStreamReader(postData, "UTF-8"));
@@ -217,5 +211,4 @@ public class SendLogControllerImpl implements SendLogController
         test.shutdown();
         connectionNotify(theTracker);
     }
-
 }
