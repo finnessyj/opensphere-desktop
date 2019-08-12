@@ -1,12 +1,12 @@
 package io.opensphere.controlpanels.component.image;
 
 import java.awt.Image;
-import java.util.Observable;
+import java.beans.PropertyChangeSupport;
 
 /**
  * The model used by the ScaledImagePanel.
  */
-public class ScaledImageModel extends Observable
+public class ScaledImageModel
 {
     /**
      * The image property.
@@ -14,9 +14,24 @@ public class ScaledImageModel extends Observable
     public static final String IMAGE_PROP = "image";
 
     /**
-     * The width height property.
+     * The bean for change notifications.
      */
-    public static final String WIDTH_HEIGHT_PROP = "widthHeight";
+    private PropertyChangeSupport mySupport = new PropertyChangeSupport(this);
+
+    public PropertyChangeSupport getChangeSupport()
+    {
+        return mySupport;
+    }
+
+    /**
+     * The width property.
+     */
+    public static final String WIDTH_PROP = "width";
+
+    /**
+     * The height property.
+     */
+    public static final String HEIGHT_PROP = "height";
 
     /**
      * The height of the component.
@@ -130,9 +145,8 @@ public class ScaledImageModel extends Observable
      */
     public void setImage(Image image)
     {
+        mySupport.firePropertyChange(IMAGE_PROP, myImage, image);
         myImage = image;
-        setChanged();
-        notifyObservers(IMAGE_PROP);
     }
 
     /**
@@ -165,10 +179,10 @@ public class ScaledImageModel extends Observable
     {
         if (width != myWidth || height != myHeight)
         {
+            mySupport.firePropertyChange(WIDTH_PROP, myWidth, width);
+            mySupport.firePropertyChange(HEIGHT_PROP, myHeight, height);
             myWidth = width;
             myHeight = height;
-            setChanged();
-            notifyObservers(WIDTH_HEIGHT_PROP);
         }
     }
 

@@ -54,21 +54,6 @@ public class ScaledImageControllerTest
     }
 
     /**
-     * Tests closing the controller.
-     */
-    @Test
-    public void testClose()
-    {
-        ScaledImageModel model = new ScaledImageModel();
-
-        ScaledImageController controller = new ScaledImageController(model);
-
-        assertEquals(1, model.countObservers());
-        controller.close();
-        assertEquals(0, model.countObservers());
-    }
-
-    /**
      * Tests when there isn't an image set.
      */
     @SuppressWarnings("unused")

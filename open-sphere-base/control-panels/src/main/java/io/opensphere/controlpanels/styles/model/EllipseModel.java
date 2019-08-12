@@ -1,42 +1,25 @@
 package io.opensphere.controlpanels.styles.model;
 
+import java.beans.PropertyChangeSupport;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Observable;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 /**
  * The model to describe the ellipse style bullseye.
  */
-public class EllipseModel extends Observable implements Serializable
+public class EllipseModel implements Serializable
 {
-    /**
-     * The orientation property.
-     */
-    public static final String ORIENTATION_PROP = "orientation";
-
-    /**
-     * The semi major property.
-     */
-    public static final String SEMI_MAJOR_PROP = "semimajor";
-
-    /**
-     * The semi major units property.
-     */
-    public static final String SEMI_MAJOR_UNITS_PROP = "semimajorunits";
-
-    /**
-     * The semi minor property.
-     */
-    public static final String SEMI_MINOR_PROP = "semiminor";
-
-    /**
-     * The semi minor units property.
-     */
-    public static final String SEMI_MINOR_UNITS_PROP = "semiminorunits";
 
     /**
      * Defaults serialization id.
@@ -56,27 +39,40 @@ public class EllipseModel extends Observable implements Serializable
     /**
      * The ellipse orientation.
      */
-    private double myOrientation;
+    public transient DoubleProperty myOrientation;
+
+    /**
+     * The bean for change notifications.
+     */
+    private PropertyChangeSupport mySupport = new PropertyChangeSupport(this);
 
     /**
      * The semi major length.
      */
-    private double mySemiMajor;
+    public transient DoubleProperty mySemiMajor;
 
     /**
      * The semi major length units.
      */
-    private String mySemiMajorUnits;
+    public transient StringProperty mySemiMajorUnits;
 
     /**
      * The semi minor length.
      */
-    private double mySemiMinor;
+    public transient DoubleProperty mySemiMinor;
 
     /**
      * The semi minor length units.
      */
-    private String mySemiMinorUnits;
+    public transient StringProperty mySemiMinorUnits;
+
+    /**
+     * Creates the model.
+     */
+    public EllipseModel()
+    {
+        initInstance();
+    }
 
     /**
      * Gets the available units for semi major and minor lengths and initializes
@@ -91,6 +87,51 @@ public class EllipseModel extends Observable implements Serializable
             myAvailableUnits = FXCollections.observableArrayList();
         }
         return myAvailableUnits;
+    }
+
+    /**
+     * override the serializable methods to write custom objects.
+     * 
+     * @param s the output stream to write to the cache.
+     * @throws IOException
+     */
+    private void writeObject(ObjectOutputStream s) throws IOException
+    {
+        s.defaultWriteObject();
+        s.writeDouble(myOrientation.get());
+        s.writeDouble(mySemiMajor.get());
+        s.writeDouble(mySemiMinor.get());
+        s.writeUTF(mySemiMajorUnits.get());
+        s.writeUTF(mySemiMinorUnits.get());
+    }
+
+    /**
+     * override the serializable methods to read custom objects.
+     * 
+     * @param s the input stream from the cache.
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException
+    {
+        s.defaultReadObject();
+        myOrientation = new SimpleDoubleProperty(s.readDouble());
+        mySemiMajor = new SimpleDoubleProperty(s.readDouble());
+        mySemiMinor = new SimpleDoubleProperty(s.readDouble());
+        mySemiMajorUnits = new SimpleStringProperty(s.readUTF());
+        mySemiMinorUnits = new SimpleStringProperty(s.readUTF());
+    }
+
+    /**
+     * Sets up default values for our fields.
+     */
+    private void initInstance()
+    {
+        myOrientation = new SimpleDoubleProperty(1);
+        mySemiMajor = new SimpleDoubleProperty(1);
+        mySemiMajorUnits = new SimpleStringProperty("kilometers");
+        mySemiMinor = new SimpleDoubleProperty(1);
+        mySemiMinorUnits = new SimpleStringProperty("kilometers");
     }
 
     /**
@@ -115,7 +156,7 @@ public class EllipseModel extends Observable implements Serializable
      */
     public double getOrientation()
     {
-        return myOrientation;
+        return myOrientation.getValue().doubleValue();
     }
 
     /**
@@ -125,7 +166,7 @@ public class EllipseModel extends Observable implements Serializable
      */
     public double getSemiMajor()
     {
-        return mySemiMajor;
+        return mySemiMajor.getValue().doubleValue();
     }
 
     /**
@@ -135,7 +176,7 @@ public class EllipseModel extends Observable implements Serializable
      */
     public String getSemiMajorUnits()
     {
-        return mySemiMajorUnits;
+        return mySemiMajorUnits.getValue().toString();
     }
 
     /**
@@ -145,7 +186,7 @@ public class EllipseModel extends Observable implements Serializable
      */
     public double getSemiMinor()
     {
-        return mySemiMinor;
+        return mySemiMinor.getValue().doubleValue();
     }
 
     /**
@@ -155,7 +196,7 @@ public class EllipseModel extends Observable implements Serializable
      */
     public String getSemiMinorUnits()
     {
-        return mySemiMinorUnits;
+        return mySemiMinorUnits.getValue().toString();
     }
 
     /**
@@ -165,9 +206,8 @@ public class EllipseModel extends Observable implements Serializable
      */
     public void setOrientation(double orientation)
     {
-        myOrientation = orientation;
-        setChanged();
-        notifyObservers(ORIENTATION_PROP);
+        mySupport.firePropertyChange(myOrientation.getName(), this.myOrientation, orientation);
+        myOrientation.set(orientation);
     }
 
     /**
@@ -177,9 +217,8 @@ public class EllipseModel extends Observable implements Serializable
      */
     public void setSemiMajor(double semiMajor)
     {
-        mySemiMajor = semiMajor;
-        setChanged();
-        notifyObservers(SEMI_MAJOR_PROP);
+        mySupport.firePropertyChange(mySemiMajor.getName(), this.mySemiMajor.getValue(), semiMajor);
+        mySemiMajor.set(semiMajor);
     }
 
     /**
@@ -189,9 +228,8 @@ public class EllipseModel extends Observable implements Serializable
      */
     public void setSemiMajorUnits(String semiMajorUnits)
     {
-        mySemiMajorUnits = semiMajorUnits;
-        setChanged();
-        notifyObservers(SEMI_MAJOR_UNITS_PROP);
+        mySupport.firePropertyChange(mySemiMajorUnits.getName(), this.mySemiMajorUnits.getValue(), semiMajorUnits);
+        mySemiMajorUnits.set(semiMajorUnits);
     }
 
     /**
@@ -201,9 +239,8 @@ public class EllipseModel extends Observable implements Serializable
      */
     public void setSemiMinor(double semiMinor)
     {
-        mySemiMinor = semiMinor;
-        setChanged();
-        notifyObservers(SEMI_MINOR_PROP);
+        mySupport.firePropertyChange(mySemiMinor.getName(), this.mySemiMinor, semiMinor);
+        mySemiMinor.set(semiMinor);
     }
 
     /**
@@ -213,8 +250,7 @@ public class EllipseModel extends Observable implements Serializable
      */
     public void setSemiMinorUnits(String semiMinorUnits)
     {
-        mySemiMinorUnits = semiMinorUnits;
-        setChanged();
-        notifyObservers(SEMI_MINOR_UNITS_PROP);
+        mySupport.firePropertyChange(mySemiMinorUnits.getName(), this.mySemiMinorUnits, semiMinorUnits);
+        mySemiMinorUnits.set(semiMinorUnits);
     }
 }

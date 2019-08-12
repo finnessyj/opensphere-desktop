@@ -17,11 +17,6 @@ public class ScaledImageComponent extends Component
     private static final long serialVersionUID = 1L;
 
     /**
-     * The controller used to tell the component how to draw the image.
-     */
-    private final ScaledImageController myController;
-
-    /**
      * The model used by the component.
      */
     private final ScaledImageModel myModel = new ScaledImageModel();
@@ -31,7 +26,6 @@ public class ScaledImageComponent extends Component
      */
     public ScaledImageComponent()
     {
-        myController = new ScaledImageController(myModel);
         setPreferredSize(new Dimension(600, 300));
     }
 
@@ -55,12 +49,5 @@ public class ScaledImageComponent extends Component
     {
         myModel.setImage(image);
         repaint();
-    }
-
-    @Override
-    protected void finalize() throws Throwable
-    {
-        myController.close();
-        super.finalize();
     }
 }

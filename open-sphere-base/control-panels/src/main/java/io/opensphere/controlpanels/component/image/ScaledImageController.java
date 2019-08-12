@@ -1,14 +1,14 @@
 package io.opensphere.controlpanels.component.image;
 
 import java.awt.Image;
-import java.util.Observable;
-import java.util.Observer;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * The controller that will calculate where and how big to draw the image so
  * that it scales and keeps the aspect ratio.
  */
-public class ScaledImageController implements Observer
+public class ScaledImageController implements PropertyChangeListener
 {
     /**
      * The model.
@@ -23,21 +23,15 @@ public class ScaledImageController implements Observer
     public ScaledImageController(ScaledImageModel model)
     {
         myModel = model;
-        myModel.addObserver(this);
     }
 
-    /**
-     * Stops listening to model changes.
-     */
-    public void close()
+    public void propertyChange(PropertyChangeEvent evt)
     {
-        myModel.deleteObserver(this);
-    }
-
-    @Override
-    public void update(Observable o, Object arg)
-    {
-        if (ScaledImageModel.IMAGE_PROP.equals(arg) || ScaledImageModel.WIDTH_HEIGHT_PROP.equals(arg))
+        if (evt.getPropertyName().equals(ScaledImageModel.WIDTH_PROP))
+        {
+            calculateImageDrawBounds();
+        }
+        if (evt.getPropertyName().equals(ScaledImageModel.HEIGHT_PROP))
         {
             calculateImageDrawBounds();
         }
@@ -102,4 +96,5 @@ public class ScaledImageController implements Observer
             }
         }
     }
+
 }

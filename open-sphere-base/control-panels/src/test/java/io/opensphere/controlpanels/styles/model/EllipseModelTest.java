@@ -45,7 +45,6 @@ public class EllipseModelTest
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectOutputStream objectOut = new ObjectOutputStream(out);
-
         objectOut.writeObject(model);
 
         ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
@@ -70,12 +69,6 @@ public class EllipseModelTest
     {
         EasyMockSupport support = new EasyMockSupport();
 
-        Observer orientation = createObserver(support, EllipseModel.ORIENTATION_PROP);
-        Observer semiMajor = createObserver(support, EllipseModel.SEMI_MAJOR_PROP);
-        Observer semiMinor = createObserver(support, EllipseModel.SEMI_MINOR_PROP);
-        Observer semiMajorUnits = createObserver(support, EllipseModel.SEMI_MAJOR_UNITS_PROP);
-        Observer semiMinorUnits = createObserver(support, EllipseModel.SEMI_MINOR_UNITS_PROP);
-
         ChangeListener<? super Boolean> enabledListener = support.createMock(ChangeListener.class);
         enabledListener.changed(EasyMock.isA(BooleanProperty.class), EasyMock.eq(Boolean.FALSE), EasyMock.eq(Boolean.TRUE));
 
@@ -91,41 +84,16 @@ public class EllipseModelTest
         model.getAvailableUnits().addListener(listListener);
         model.getAvailableUnits().addAll("nmi", "mi");
 
-        model.addObserver(orientation);
         model.setOrientation(10);
-        model.deleteObserver(orientation);
 
-        model.addObserver(semiMajor);
         model.setSemiMajor(11);
-        model.deleteObserver(semiMajor);
 
-        model.addObserver(semiMinor);
         model.setSemiMinor(10);
-        model.deleteObserver(semiMinor);
 
-        model.addObserver(semiMajorUnits);
         model.setSemiMajorUnits("mi");
-        model.deleteObserver(semiMajorUnits);
 
-        model.addObserver(semiMinorUnits);
         model.setSemiMinorUnits("mi");
 
         support.verifyAll();
-    }
-
-    /**
-     * Creates an easy mocked observer.
-     *
-     * @param support Used to create the mock.
-     * @param property The property expected to be updated.
-     * @return The easy mocked observer.
-     */
-    private Observer createObserver(EasyMockSupport support, String property)
-    {
-        Observer observer = support.createMock(Observer.class);
-
-        observer.update(EasyMock.isA(EllipseModel.class), EasyMock.cmpEq(property));
-
-        return observer;
     }
 }

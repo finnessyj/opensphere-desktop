@@ -1,7 +1,7 @@
 package io.opensphere.controlpanels.styles.ui;
 
-import java.util.Observable;
-import java.util.Observer;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
@@ -18,7 +18,7 @@ import io.opensphere.controlpanels.styles.model.EllipseModel;
  * Binds the {@link EllipseView} to the {@link EllipseModel} so that the values
  * of the view and model are synchronized.
  */
-public class EllipseBinder implements Observer
+public class EllipseBinder implements PropertyChangeListener
 {
     /**
      * The model to bind to.
@@ -73,7 +73,7 @@ public class EllipseBinder implements Observer
      */
     public void close()
     {
-        myModel.deleteObserver(this);
+        // myModel.deleteObserver(this);
 
         Bindings.unbindBidirectional(myView.getOrientationField().textProperty(), myOrientationProp);
         Bindings.unbindBidirectional(myView.getSemiMajorField().textProperty(), mySemiMajorProp);
@@ -87,25 +87,27 @@ public class EllipseBinder implements Observer
     }
 
     @Override
-    public void update(Observable o, Object arg)
+    public void propertyChange(PropertyChangeEvent evt)
     {
-        if (EllipseModel.ORIENTATION_PROP.equals(arg))
+        String arg = evt.getPropertyName();
+        System.out.println(arg);
+        if (myModel.myOrientation.getName().equals(arg))
         {
             myOrientationProp.set(myModel.getOrientation());
         }
-        else if (EllipseModel.SEMI_MAJOR_PROP.equals(arg))
+        else if (myModel.mySemiMajor.getName().equals(arg))
         {
             mySemiMajorProp.set(myModel.getSemiMajor());
         }
-        else if (EllipseModel.SEMI_MAJOR_UNITS_PROP.equals(arg))
+        else if (myModel.mySemiMajorUnits.getName().equals(arg))
         {
             mySemiMajorUnitProp.set(myModel.getSemiMajorUnits());
         }
-        else if (EllipseModel.SEMI_MINOR_PROP.equals(arg))
+        else if (myModel.mySemiMinor.getName().equals(arg))
         {
             mySemiMinorProp.set(myModel.getSemiMinor());
         }
-        else if (EllipseModel.SEMI_MINOR_UNITS_PROP.equals(arg))
+        else if (myModel.mySemiMinorUnits.getName().equals(arg))
         {
             mySemiMinorUnitProp.set(myModel.getSemiMinorUnits());
         }
@@ -136,8 +138,6 @@ public class EllipseBinder implements Observer
 
         myView.getSemiMinorUnitsPicker().valueProperty().bindBidirectional(mySemiMinorUnitProp);
         myView.getSemiMinorUnitsPicker().setItems(myModel.getAvailableUnits());
-
-        myModel.addObserver(this);
     }
 
     /**

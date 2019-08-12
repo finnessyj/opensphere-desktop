@@ -25,12 +25,9 @@ public class ScaledImageModelTest
     {
         EasyMockSupport support = new EasyMockSupport();
 
-        Observer observer = createObserver(support);
-
         support.replayAll();
 
         ScaledImageModel model = new ScaledImageModel();
-        model.addObserver(observer);
 
         model.setWidthAndHeight(100, 100);
         model.setWidthAndHeight(100, 200);
@@ -40,22 +37,5 @@ public class ScaledImageModelTest
         model.setImage(ourImage);
 
         support.verifyAll();
-    }
-
-    /**
-     * Creates an easy mocked {@link Observer}.
-     *
-     * @param support Used to create the mock.
-     * @return The observer.
-     */
-    private Observer createObserver(EasyMockSupport support)
-    {
-        Observer observer = support.createMock(Observer.class);
-
-        observer.update(EasyMock.isA(ScaledImageModel.class), EasyMock.cmpEq(ScaledImageModel.IMAGE_PROP));
-        observer.update(EasyMock.isA(ScaledImageModel.class), EasyMock.cmpEq(ScaledImageModel.WIDTH_HEIGHT_PROP));
-        EasyMock.expectLastCall().times(3);
-
-        return observer;
     }
 }

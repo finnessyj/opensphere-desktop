@@ -1,7 +1,7 @@
 package io.opensphere.controlpanels.styles.ui;
 
-import java.util.Observable;
-import java.util.Observer;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -19,7 +19,7 @@ import io.opensphere.core.util.fx.FXUtilities;
  * Binds the UI components to the appropriate model components and keeps both
  * model and UI synchronized.
  */
-public class StyleOptionsBinder implements Observer
+public class StyleOptionsBinder implements PropertyChangeListener
 {
     /**
      * The color property for binding.
@@ -56,6 +56,7 @@ public class StyleOptionsBinder implements Observer
     {
         myView = view;
         myModel = model;
+        
         bind();
     }
 
@@ -64,8 +65,6 @@ public class StyleOptionsBinder implements Observer
      */
     public void close()
     {
-        myModel.deleteObserver(this);
-
         myView.getSize().valueProperty().unbindBidirectional(mySizeProperty);
         myView.getColorPicker().valueProperty().unbindBidirectional(myColorProperty);
         myView.getStylePicker().valueProperty().unbindBidirectional(mySelectedStyleProperty);
@@ -73,17 +72,18 @@ public class StyleOptionsBinder implements Observer
     }
 
     @Override
-    public void update(Observable o, Object arg)
+    public void propertyChange(PropertyChangeEvent evt)
     {
-        if (StyleOptions.COLOR_PROP.equals(arg))
+        String arg = evt.getPropertyName();
+        if (myModel.myColor.getName().equals(arg))
         {
             colorFromModel();
         }
-        else if (StyleOptions.SIZE_PROP.equals(arg))
+        else if (myModel.mySize.getName().equals(arg))
         {
             mySizeProperty.set(myModel.getSize());
         }
-        else if (StyleOptions.STYLE_PROP.equals(arg))
+        else if (myModel.myStyle.getName().equals(arg))
         {
             mySelectedStyleProperty.set(myModel.getStyle());
         }
@@ -107,8 +107,6 @@ public class StyleOptionsBinder implements Observer
         myView.getStylePicker().setItems(myModel.getStyles());
 
         colorFromModel();
-
-        myModel.addObserver(this);
     }
 
     /**

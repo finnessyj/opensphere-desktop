@@ -1,10 +1,12 @@
 package io.opensphere.controlpanels.styles.model;
 
 import java.awt.Color;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
-import java.util.Observable;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -12,6 +14,11 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -20,27 +27,8 @@ import javafx.collections.ObservableList;
  */
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement
-public class StyleOptions extends Observable implements Serializable
+public class StyleOptions implements Serializable
 {
-    /**
-     * The color property.
-     */
-    public static final String COLOR_PROP = "color";
-
-    /**
-     * The icon id property.
-     */
-    public static final String ICON_PROP = "icon";
-
-    /**
-     * The size property.
-     */
-    public static final String SIZE_PROP = "size";
-
-    /**
-     * The style property.
-     */
-    public static final String STYLE_PROP = "style";
 
     /**
      * Serialization id.
@@ -52,7 +40,7 @@ public class StyleOptions extends Observable implements Serializable
      */
     @XmlJavaTypeAdapter(ColorAdapter.class)
     @XmlAttribute(name = "color")
-    private Color myColor = Color.RED;
+    public transient SimpleObjectProperty<Color> myColor;
 
     /**
      * Indicates if the size has been set by a user.
@@ -64,24 +52,68 @@ public class StyleOptions extends Observable implements Serializable
      * The id of the icon to display in this style.
      */
     @XmlAttribute(name = "iconId")
-    private long myIconId;
+    public transient LongProperty myIconId;
 
     /**
      * The size of the bulls eye.
      */
     @XmlAttribute(name = "size")
-    private int mySize = 5;
+    public transient IntegerProperty mySize;
 
     /**
      * The style of the bulls eye.
      */
     @XmlAttribute(name = "style")
-    private Styles myStyle = Styles.POINT;
+    public transient SimpleObjectProperty<Styles> myStyle;
 
     /**
      * The available styles for the bulls eye.
      */
     private transient ObservableList<Styles> myStyles;
+
+    public StyleOptions()
+    {
+        init();
+    }
+
+    private void init()
+    {
+        mySize = new SimpleIntegerProperty(5);
+        myColor = new SimpleObjectProperty<Color>(Color.RED);
+        myStyle = new SimpleObjectProperty<Styles>(Styles.POINT);
+        myIconId = new SimpleLongProperty(1);
+    }
+
+    /**
+     * override the serializable methods to write custom objects.
+     * 
+     * @param s the output stream to write to the cache.
+     * @throws IOException
+     */
+    private void writeObject(ObjectOutputStream s) throws IOException
+    {
+        s.defaultWriteObject();
+        s.writeInt(mySize.get());
+        s.writeObject(myColor.getValue());
+        s.writeObject(myStyle.getValue());
+        s.writeLong(myIconId.get());
+    }
+
+    /**
+     * override the serializable methods to read custom objects.
+     * 
+     * @param s the input stream from the cache.
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException
+    {
+        s.defaultReadObject();
+        mySize = new SimpleIntegerProperty(s.readInt());
+        myColor = new SimpleObjectProperty<Color>((Color)s.readObject());
+        myStyle = new SimpleObjectProperty<Styles>((Styles)s.readObject());
+        myIconId = new SimpleLongProperty(s.readLong());
+    }
 
     /**
      * Copy the contents from another (which was probably edited).
@@ -119,7 +151,7 @@ public class StyleOptions extends Observable implements Serializable
      */
     public Color getColor()
     {
-        return myColor;
+        return myColor.get();
     }
 
     /**
@@ -129,7 +161,7 @@ public class StyleOptions extends Observable implements Serializable
      */
     public long getIconId()
     {
-        return myIconId;
+        return myIconId.get();
     }
 
     /**
@@ -139,7 +171,7 @@ public class StyleOptions extends Observable implements Serializable
      */
     public int getSize()
     {
-        return mySize;
+        return mySize.get();
     }
 
     /**
@@ -149,7 +181,7 @@ public class StyleOptions extends Observable implements Serializable
      */
     public Styles getStyle()
     {
-        return myStyle;
+        return myStyle.get();
     }
 
     /**
@@ -171,7 +203,7 @@ public class StyleOptions extends Observable implements Serializable
     @Override
     public int hashCode()
     {
-        return Objects.hash(myColor, Long.valueOf(myIconId), Integer.valueOf(mySize), myStyle);
+        return Objects.hash(myColor, Long.valueOf(myIconId.get()), Integer.valueOf(mySize.get()), myStyle);
     }
 
     /**
@@ -191,9 +223,7 @@ public class StyleOptions extends Observable implements Serializable
      */
     public void setColor(Color color)
     {
-        myColor = color;
-        setChanged();
-        notifyObservers(COLOR_PROP);
+        myColor.set(color);
     }
 
     /**
@@ -203,9 +233,7 @@ public class StyleOptions extends Observable implements Serializable
      */
     public void setIconId(long iconId)
     {
-        myIconId = iconId;
-        setChanged();
-        notifyObservers(ICON_PROP);
+        myIconId.set(iconId);
     }
 
     /**
@@ -215,10 +243,8 @@ public class StyleOptions extends Observable implements Serializable
      */
     public void setSize(int size)
     {
-        mySize = size;
+        mySize.set(size);
         myHasSizeBeenSet = true;
-        setChanged();
-        notifyObservers(SIZE_PROP);
     }
 
     /**
@@ -228,9 +254,7 @@ public class StyleOptions extends Observable implements Serializable
      */
     public void setStyle(Styles style)
     {
-        myStyle = style;
-        setChanged();
-        notifyObservers(STYLE_PROP);
+        myStyle.set(style);
     }
 
     /**
