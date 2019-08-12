@@ -1,6 +1,5 @@
 package io.opensphere.controlpanels.styles.model;
 
-import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -40,11 +39,6 @@ public class EllipseModel implements Serializable
      * The ellipse orientation.
      */
     public transient DoubleProperty myOrientation;
-
-    /**
-     * The bean for change notifications.
-     */
-    private PropertyChangeSupport mySupport = new PropertyChangeSupport(this);
 
     /**
      * The semi major length.
@@ -206,7 +200,7 @@ public class EllipseModel implements Serializable
      */
     public void setOrientation(double orientation)
     {
-        mySupport.firePropertyChange(myOrientation.getName(), this.myOrientation, orientation);
+      //  mySupport.firePropertyChange(myOrientation.getName(), this.myOrientation, orientation);
         myOrientation.set(orientation);
     }
 
@@ -217,7 +211,7 @@ public class EllipseModel implements Serializable
      */
     public void setSemiMajor(double semiMajor)
     {
-        mySupport.firePropertyChange(mySemiMajor.getName(), this.mySemiMajor.getValue(), semiMajor);
+     //   mySupport.firePropertyChange(mySemiMajor.getName(), this.mySemiMajor.getValue(), semiMajor);
         mySemiMajor.set(semiMajor);
     }
 
@@ -228,7 +222,7 @@ public class EllipseModel implements Serializable
      */
     public void setSemiMajorUnits(String semiMajorUnits)
     {
-        mySupport.firePropertyChange(mySemiMajorUnits.getName(), this.mySemiMajorUnits.getValue(), semiMajorUnits);
+   //     mySupport.firePropertyChange(mySemiMajorUnits.getName(), this.mySemiMajorUnits.getValue(), semiMajorUnits);
         mySemiMajorUnits.set(semiMajorUnits);
     }
 
@@ -239,7 +233,7 @@ public class EllipseModel implements Serializable
      */
     public void setSemiMinor(double semiMinor)
     {
-        mySupport.firePropertyChange(mySemiMinor.getName(), this.mySemiMinor, semiMinor);
+      //  mySupport.firePropertyChange(mySemiMinor.getName(), this.mySemiMinor, semiMinor);
         mySemiMinor.set(semiMinor);
     }
 
@@ -250,7 +244,7 @@ public class EllipseModel implements Serializable
      */
     public void setSemiMinorUnits(String semiMinorUnits)
     {
-        mySupport.firePropertyChange(mySemiMinorUnits.getName(), this.mySemiMinorUnits, semiMinorUnits);
+  //      mySupport.firePropertyChange(mySemiMinorUnits.getName(), this.mySemiMinorUnits, semiMinorUnits);
         mySemiMinorUnits.set(semiMinorUnits);
     }
 }
