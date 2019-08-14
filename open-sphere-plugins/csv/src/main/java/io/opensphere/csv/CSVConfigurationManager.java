@@ -108,7 +108,7 @@ public class CSVConfigurationManager
     }
 
     /**
-     * Inserts the placeholder delimiter "TAB" wherever the token 
+     * Inserts the placeholder delimiter "TAB" wherever the token
      * delimiter is "\t".
      *
      * @param sources collection of data sources to change delimiter
